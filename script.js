@@ -2,6 +2,7 @@ window.onload=function() {
     canv = document.getElementById("gc");
     ctx = canv.getContext("2d");
     document.addEventListener("mousedown",mouseDown);
+    document.addEventListener("mousemove",mouseMove);
     document.addEventListener("mouseup",mouseUp);
     setInterval(game,30);
 }
@@ -14,6 +15,8 @@ asteroid.src = "res/asteroid.png";
 
 var sun = new Image();
 sun.src = "res/star.png";
+
+let mousePress = false;
 
 let ball = {
     x: 15.0,
@@ -97,6 +100,9 @@ function game() {
 
 
     //Draw
+    
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 5;
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
  
@@ -106,10 +112,13 @@ function game() {
 
     ctx.drawImage(asteroid, Math.floor(ball.x), Math.floor(ball.y));
 
-    ctx.beginPath();       // Start a new path
-    ctx.moveTo(mouse.x1, mouse.y1);    // Move the pen to (30, 50)
-    ctx.lineTo(mouse.x2, mouse.y2);  // Draw a line to (150, 100)
-    ctx.stroke();
+    if (mousePress) {
+        ctx.beginPath();
+        ctx.moveTo(mouse.x1 - canv.getBoundingClientRect().left, mouse.y1 - canv.getBoundingClientRect().top);    // Move the pen to (30, 50)
+        ctx.lineTo(mouse.x2 - canv.getBoundingClientRect().left, mouse.y2 - canv.getBoundingClientRect().top);  // Draw a line to (150, 100)
+        ctx.closePath();
+        ctx.stroke();
+    }
 }
 
 function newGame() {
@@ -129,14 +138,21 @@ function newGame() {
     star.height = star.width;
 }
 function mouseDown(evt) {
+    mousePress = true;
     mouse.x1 = evt.clientX;
     mouse.y1 = evt.clientY;
 }
 
 function mouseUp(evt) {
+    mousePress = false;
     mouse.x2 = evt.clientX;
     mouse.y2 = evt.clientY;
 
     ball.speedX += 0.1 * (mouse.x1 - mouse.x2);
     ball.speedY += 0.1 * (mouse.y1 - mouse.y2);
+}
+
+function mouseMove(evt) {
+    mouse.x2 = evt.clientX;
+    mouse.y2 = evt.clientY;
 }
